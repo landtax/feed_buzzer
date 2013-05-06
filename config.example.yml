@@ -1,0 +1,11 @@
+# Feed options
+host: "https://username:password@localhost/feed"
+
+# SSL options
+verify_peer: true
+
+#  ssl_version available: 3-> SSLv3,  2 -> SSLv2 
+ssl_version: 2
+
+# Daemon options
+check_interval: 10 # in seconds
