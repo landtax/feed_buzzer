@@ -15,30 +15,45 @@ OptionParser.new do |opts|
 
 end.parse!
 
-config = OpenStruct.new(YAML.load_file(options[:config_path]))
-feed = Feedzirra::Feed.fetch_and_parse(config.host,
-                                     {:ssl_verify_peer => config.verify_peer, 
-                                      :ssl_version => "Curl::CURL_SSLVERSION_SSLv#{config.ssl_version}".constantize})
-def notify(entries)
-  entries.each do |entry|
-    puts entry.content
-  end
-end
 
+class FeedBuzzer
+  attr_accessor :config, :feed
 
-notify(feed.entries)
+  def initialize(config_path)
+    self.config = OpenStruct.new(YAML.load_file(config_path))
+    self.feed = Feedzirra::Feed.fetch_and_parse(config.host,
+                                                {:ssl_verify_peer => config.verify_peer, 
+                                                 :ssl_version => "Curl::CURL_SSLVERSION_SSLv#{config.ssl_version}".constantize})
 
-loop do
-
-  sleep(config.check_interval)
-
-  Feedzirra::Feed.update(feed)
-
-  if feed.updated?
-    notify(feed.new_entries)
   end
 
+  def run
+    notify(feed.entries)
+
+    loop do
+      sleep(config.check_interval)
+      Feedzirra::Feed.update(feed)
+
+      if feed.updated?
+        notify(feed.new_entries)
+      end
+    end
+
+  end
+
+  def notify(entries)
+    entries.each do |entry|
+      puts entry.content
+    end
+  end
+
 end
+
+buzzer = FeedBuzzer.new(options[:config_path])
+buzzer.run
+
+
+
 
 
 
@@ -97,8 +112,8 @@ end
 
 ## defining custom behavior on failure or success. note that a return status of 304 (not updated) will call the on_success handler
 #feed = Feedzirra::Feed.fetch_and_parse("http://feeds.feedburner.com/PaulDixExplainsNothing",
-	#:on_success => lambda {|feed| puts feed.title },
-	#:on_failure => lambda {|url, response_code, response_header, response_body| puts response_body })
+#:on_success => lambda {|feed| puts feed.title },
+#:on_failure => lambda {|url, response_code, response_header, response_body| puts response_body })
 ## if a collection was passed into fetch_and_parse, the handlers will be called for each one
 
 ## the behavior for the handlers when using Feedzirra::Feed.update is slightly different. The feed passed into on_success will be
