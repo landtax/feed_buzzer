@@ -9,3 +9,6 @@ ssl_version: 2
 
 # Daemon options
 check_interval: 10 # in seconds
+
+# Nortification url
+notify_url: "http://localhost:3000/notify"
