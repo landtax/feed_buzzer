@@ -24,7 +24,6 @@ class FeedBuzzer
     self.feed = Feedzirra::Feed.fetch_and_parse(config.host,curl_options)
   end
 
-
   def run
     notify(feed.entries)
 
