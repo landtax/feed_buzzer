@@ -30,8 +30,9 @@ class FeedBuzzer
     loop do
       sleep(config.check_interval)
       Feedzirra::Feed.update(feed, curl_options)
-      if feed.updated?
+      if feed.has_new_entries?
         notify(feed.new_entries)
+        feed.new_entries.clear
       end
     end
 
