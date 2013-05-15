@@ -1,8 +1,11 @@
 require 'rubygems'
+require 'bundler/setup'
 require 'feedzirra'
 require 'curb'
 require 'yaml'
 require 'optparse'
+require 'ostruct'
+require 'active_support/inflector'
 
 options = {}
 OptionParser.new do |opts|
