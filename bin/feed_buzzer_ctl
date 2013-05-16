@@ -1,0 +1,23 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'daemons'
+require 'bundler/setup'
+require 'optparse'
+require_relative '../lib/feed_buzzer'
+
+
+options = {}
+OptionParser.new do |opts|
+  opts.banner = "Usage: ruby feed_buzzer.rb [options]"
+
+  opts.on("-c", "--config [CONFIG_PATH]" , "Configuration file") do |v|
+    options[:config_path] = File.expand_path(v)
+  end
+
+end.parse!(ARGV)
+
+buzzer = FeedBuzzer.new(options[:config_path])
+Daemons.run_proc("feed_buzzer", {:log_output => true}) do
+  buzzer.run
+end

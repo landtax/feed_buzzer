@@ -1,22 +1,8 @@
-require 'rubygems'
-require 'bundler/setup'
 require 'feedzirra'
 require 'curb'
 require 'yaml'
-require 'optparse'
 require 'ostruct'
 require 'active_support/inflector'
-
-options = {}
-OptionParser.new do |opts|
-  opts.banner = "Usage: ruby feed_buzzer.rb [options]"
-
-  opts.on("-c", "--config [CONFIG_PATH]" , "Configuration file") do |v|
-    options[:config_path] = File.expand_path(v)
-  end
-
-end.parse!
-
 
 class FeedBuzzer
 
@@ -77,6 +63,3 @@ class FeedBuzzer
   end
 
 end
-
-buzzer = FeedBuzzer.new(options[:config_path])
-buzzer.run
