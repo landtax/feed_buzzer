@@ -17,7 +17,7 @@ OptionParser.new do |opts|
 
 end.parse!(ARGV)
 
-buzzer = FeedBuzzer.new(options[:config_path])
 Daemons.run_proc("feed_buzzer", {:log_output => true}) do
+  buzzer = FeedBuzzer.new(options[:config_path])
   buzzer.run
 end
