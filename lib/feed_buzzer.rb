@@ -10,28 +10,49 @@ class FeedBuzzer
 
   def initialize(config_path)
     self.config = OpenStruct.new(YAML.load_file(config_path))
-    self.feed = Feedzirra::Feed.fetch_and_parse(config.host,curl_options)
   end
 
   def run
-    notify(feed.entries)
 
     loop do
-      sleep(config.check_interval)
-      Feedzirra::Feed.update(feed, curl_options)
-      if feed.has_new_entries?
-        notify(feed.new_entries)
-        feed.new_entries.clear
+      if feed_is_valid?
+        update_feed
+      else
+        initialize_feed
+        if feed_is_valid?
+          puts "Feed valid. First bulk notification"
+          notify(feed.entries) 
+        else
+          puts "Feed invalid. Looping every #{config.check_interval} seconds"
+        end
       end
+      sleep(config.check_interval)
     end
 
   end
 
   private
 
+  def feed_is_valid?
+    return false if feed.nil?
+    !feed.is_a? Fixnum
+  end
+
+  def initialize_feed
+    self.feed = Feedzirra::Feed.fetch_and_parse(config.host,curl_options)
+  end
+
+  def update_feed
+    Feedzirra::Feed.update(feed, curl_options)
+    if feed.has_new_entries?
+      notify(feed.new_entries)
+      feed.new_entries.clear
+    end
+  end
+
   def curl_options
-  {:ssl_verify_peer => config.verify_peer,
-   :ssl_version => "Curl::CURL_SSLVERSION_SSLv#{config.ssl_version}".constantize }
+    {:ssl_verify_peer => config.verify_peer,
+     :ssl_version => "Curl::CURL_SSLVERSION_SSLv#{config.ssl_version}".constantize }
   end
 
   def notify(entries)
@@ -44,7 +65,7 @@ class FeedBuzzer
   def entry_to_params(entry)
     ret = {}
 
-    [:title, :entry_id,:published, :author, :updated, :content].each do |att|
+    [:title, :entry_id, :published, :author, :updated, :content].each do |att|
       ret[att] = entry.send(att)
     end
 
@@ -61,5 +82,4 @@ class FeedBuzzer
 
     ret
   end
-
 end
