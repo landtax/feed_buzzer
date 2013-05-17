@@ -22,8 +22,6 @@ class FeedBuzzer
         if feed_is_valid?
           puts "Feed valid. First bulk notification"
           notify(feed.entries) 
-        else
-          puts "Feed invalid. Looping every #{config.check_interval} seconds"
         end
       end
       sleep(config.check_interval)
