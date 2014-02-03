@@ -3,6 +3,7 @@ host: "https://username:password@localhost/feed"
 
 # SSL options
 verify_peer: true
+verify_host: true
 
 #  ssl_version available: 3-> SSLv3,  2 -> SSLv2 
 ssl_version: 2

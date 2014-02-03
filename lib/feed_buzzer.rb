@@ -50,6 +50,7 @@ class FeedBuzzer
 
   def curl_options
     {:ssl_verify_peer => config.verify_peer,
+     :ssl_verify_host => config.verify_host,
      :ssl_version => "Curl::CURL_SSLVERSION_SSLv#{config.ssl_version}".constantize }
   end
 
